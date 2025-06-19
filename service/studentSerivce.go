@@ -9,6 +9,7 @@ import (
 type StudentService interface {
 	GetAll() []model.Student
 	GetByID(id int64) (*model.Student, bool)
+	PutByID(id int64, student model.StudentUpdate) bool
 }
 
 type studentService struct {
@@ -41,4 +42,27 @@ func (s *studentService) GetByID (id int64) (*model.Student, bool) {
 		}
 	}
 	return nil, false
+}
+
+func (s *studentService) PutByID(id int64, student model.StudentUpdate) bool {
+	for i, stu := range s.students {
+		if stu.ID == id {
+			if student.Name != nil {
+				s.students[i].Name = *student.Name
+			}
+			if student.Email != nil {
+				s.students[i].Email = *student.Email
+				
+			}
+			if student.Dob != nil {
+				s.students[i].Dob = *student.Dob
+			}
+			if student.Gpa != nil {
+				s.students[i].Gpa = *student.Gpa
+			}
+
+			return true
+		}
+	}
+	return false
 }

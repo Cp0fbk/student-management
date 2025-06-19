@@ -12,4 +12,12 @@ type Student struct {
 	Gpa   float64   `json:"gpa"`
 }
 
+type StudentUpdate struct {
+	Name  *string    `json:"name"`
+	Email *string    `json:"email"`
+	Dob   *time.Time `json:"dob"`
+	Gpa   *float64   `json:"gpa"`
+}
+
+
 
