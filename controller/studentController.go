@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"strconv"
 	"student-management/model"
 	"student-management/service"
@@ -29,7 +30,11 @@ func (c *StudentController) Get(ctx iris.Context) mvc.Result {
 		return mvc.Response{Code: 400, Content: []byte("Invalid sort order, must be 'asc' or 'desc'")}
 	}
 
-	c.Service.SortByGPA(sortOrder)
+	if sortOrder == "asc" {
+		c.Service.SortByGPA("asc")
+	} else if sortOrder == "desc" {
+		c.Service.SortByGPA("desc")
+	}
 
 	students := c.Service.GetAll()
 	total := len(students)
@@ -83,6 +88,17 @@ func (c *StudentController) PutBy(ctx iris.Context, id int64) mvc.Result {
 
 	if student != nil {
 		// Update the student information
+		body, err := ctx.GetBody()
+		if err != nil {
+			return mvc.Response{Code: 400, Content: []byte("Cannot read body")}
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(body, &raw); err != nil {
+			return mvc.Response{Code: 400, Content: []byte("Invalid JSON")}
+		}
+		if _, exists := raw["id"]; exists {
+			return mvc.Response{Code: 400, Content: []byte("Cannot update ID field")}
+		}
 		var update model.StudentUpdate
 		if err := ctx.ReadJSON(&update); err != nil {
 			return mvc.Response{Code: 400, Content: []byte("Invalid request")}
