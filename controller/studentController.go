@@ -14,11 +14,11 @@ type StudentController struct {
 	Service service.StudentService
 }
 
-// GET /students?page=0?limit=10?sort=order 
+// GET /students?page=0?limit=10?sort=order
 func (c *StudentController) Get(ctx iris.Context) mvc.Result {
 	pageStr := ctx.URLParamDefault("page", "0")
 	limitStr := ctx.URLParamDefault("limit", "10")
-	sortOrder := ctx.URLParamDefault("sort", "asc")
+	sortOrder := ctx.URLParamDefault("sort", "")
 
 	page, err1 := strconv.Atoi(pageStr)
 	limit, err2 := strconv.Atoi(limitStr)
@@ -26,17 +26,18 @@ func (c *StudentController) Get(ctx iris.Context) mvc.Result {
 	if err1 != nil || err2 != nil || page < 0 || limit < 1 {
 		return mvc.Response{Code: 400, Content: []byte("Invalid page or limit")}
 	}
-	if sortOrder != "asc" && sortOrder != "desc" {
-		return mvc.Response{Code: 400, Content: []byte("Invalid sort order, must be 'asc' or 'desc'")}
-	}
-
-	if sortOrder == "asc" {
-		c.Service.SortByGPA("asc")
-	} else if sortOrder == "desc" {
-		c.Service.SortByGPA("desc")
+	if sortOrder != "" && sortOrder != "asc" && sortOrder != "desc" {
+		return mvc.Response{
+			Code:    400,
+			Content: []byte("Invalid sort order, must be 'asc' or 'desc'"),
+		}
 	}
 
 	students := c.Service.GetAll()
+	if sortOrder == "asc" || sortOrder == "desc" {
+		students = c.Service.SortByGPA(sortOrder)
+	}
+
 	total := len(students)
 	totalPages := (total + limit - 1) / limit
 
@@ -76,7 +77,7 @@ func (c *StudentController) GetBy(ctx iris.Context, id int64) mvc.Result {
 
 // PUT /students/{:id}
 func (c *StudentController) PutBy(ctx iris.Context, id int64) mvc.Result {
-	student, found := c.Service.GetByID(id)
+	_, found := c.Service.GetByID(id)
 
 	if id < 221000 || id > 221999 {
 		return mvc.Response{Code: 400, Content: []byte("Invalid ID, ID must be between 221000 and 221999")}
@@ -86,31 +87,27 @@ func (c *StudentController) PutBy(ctx iris.Context, id int64) mvc.Result {
 		return mvc.Response{Code: 404, Content: []byte("Not found")}
 	}
 
-	if student != nil {
-		// Update the student information
-		body, err := ctx.GetBody()
-		if err != nil {
-			return mvc.Response{Code: 400, Content: []byte("Cannot read body")}
-		}
-		var raw map[string]interface{}
-		if err := json.Unmarshal(body, &raw); err != nil {
-			return mvc.Response{Code: 400, Content: []byte("Invalid JSON")}
-		}
-		if _, exists := raw["id"]; exists {
-			return mvc.Response{Code: 400, Content: []byte("Cannot update ID field")}
-		}
-		var update model.StudentUpdate
-		if err := ctx.ReadJSON(&update); err != nil {
-			return mvc.Response{Code: 400, Content: []byte("Invalid request")}
-		}
-		c.Service.PutByID(id, update)
-		return mvc.Response{
-			Object: iris.Map{
-				"message": "Student updated successfully",
-			},
-		}
+	var update model.StudentUpdate
+
+	var raw map[string]any
+	if err := ctx.ReadJSON(&raw); err != nil {
+		return mvc.Response{Code: 400, Content: []byte("Invalid JSON")}
 	}
-	return mvc.Response{Code: 400, Content: []byte("Invalid request")}
+	if _, exists := raw["id"]; exists {
+		return mvc.Response{Code: 400, Content: []byte("Cannot update ID field")}
+	}
+
+	jsonBytes, _ := json.Marshal(raw)
+	if err := json.Unmarshal(jsonBytes, &update); err != nil {
+		return mvc.Response{Code: 400, Content: []byte("Invalid request")}
+	}
+
+	c.Service.PutByID(id, update)
+	return mvc.Response{
+		Object: iris.Map{
+			"message": "Student updated successfully",
+		},
+	}
 }
 
 // POST /students
@@ -118,10 +115,6 @@ func (c *StudentController) Post(ctx iris.Context) mvc.Result {
 	var student model.Student
 	if err := ctx.ReadJSON(&student); err != nil {
 		return mvc.Response{Code: 400, Content: []byte("Invalid request")}
-	}
-
-	if student.ID < 221000 || student.ID > 221999 {
-		return mvc.Response{Code: 400, Content: []byte("Invalid ID, ID must be between 221000 and 221999")}
 	}
 
 	students := c.Service.GetAll()
