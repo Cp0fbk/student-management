@@ -19,5 +19,10 @@ type StudentUpdate struct {
 	Gpa   *float64   `json:"gpa"`
 }
 
+type SearchRequest struct {
+	Query string `json:"query"`
+}
+
+
 
 

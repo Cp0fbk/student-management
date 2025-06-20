@@ -157,3 +157,23 @@ func (c *StudentController) DeleteBy(ctx iris.Context, id int64) mvc.Result {
 	}
 	return mvc.Response{Code: 404, Content: []byte("Not found")}
 }
+
+// POST /students/search
+func (c *StudentController) PostSearch(ctx iris.Context) mvc.Result {
+	var req model.SearchRequest
+	if err := ctx.ReadJSON(&req); err != nil || req.Query == "" {
+		return mvc.Response{Code: 400, Content: []byte("Missing search query")}
+	}
+
+	results := c.Service.SearchBy(req.Query)
+	if len(results) == 0 {
+		return mvc.Response{
+			Code:   404,
+			Object: iris.Map{"message": "No students found"},
+		}
+	}
+
+	return mvc.Response{
+		Object: results,
+	}
+}

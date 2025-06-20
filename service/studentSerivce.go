@@ -5,6 +5,8 @@ import (
 	"os"
 	"sort"
 	"student-management/model"
+	"strings"
+	"fmt"
 )
 
 type StudentService interface {
@@ -15,6 +17,7 @@ type StudentService interface {
 	DeleteByID(id int64) bool
 	SaveToFile() error
 	SortByGPA(order string)
+	SearchBy(data string) []model.Student
 }
 
 type studentService struct {
@@ -114,4 +117,20 @@ func (s *studentService) SortByGPA(order string) {
 		}
 		return s.students[i].Gpa > s.students[j].Gpa
 	})
+}
+
+func (s *studentService) SearchBy(query string) []model.Student {
+	query = strings.ToLower(query)
+	var results []model.Student
+
+	for _, student := range s.students {
+		if strings.Contains(strings.ToLower(student.Name), query) ||
+			strings.Contains(strings.ToLower(student.Email), query) ||
+			strings.Contains(strings.ToLower(student.Dob.Format("2006-01-02")), query) ||
+			strings.Contains(strings.ToLower(fmt.Sprintf("%.2f", student.Gpa)), query) ||
+			strings.Contains(fmt.Sprintf("%d", student.ID), query) {
+			results = append(results, student)
+		}
+	}
+	return results
 }
