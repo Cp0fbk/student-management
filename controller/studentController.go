@@ -13,10 +13,11 @@ type StudentController struct {
 	Service service.StudentService
 }
 
-// GET /students?page=0?limit=10
+// GET /students?page=0?limit=10?sort=order 
 func (c *StudentController) Get(ctx iris.Context) mvc.Result {
 	pageStr := ctx.URLParamDefault("page", "0")
 	limitStr := ctx.URLParamDefault("limit", "10")
+	sortOrder := ctx.URLParamDefault("sort", "asc")
 
 	page, err1 := strconv.Atoi(pageStr)
 	limit, err2 := strconv.Atoi(limitStr)
@@ -24,6 +25,12 @@ func (c *StudentController) Get(ctx iris.Context) mvc.Result {
 	if err1 != nil || err2 != nil || page < 0 || limit < 1 {
 		return mvc.Response{Code: 400, Content: []byte("Invalid page or limit")}
 	}
+	if sortOrder != "asc" && sortOrder != "desc" {
+		return mvc.Response{Code: 400, Content: []byte("Invalid sort order, must be 'asc' or 'desc'")}
+	}
+
+	c.Service.SortByGPA(sortOrder)
+
 	students := c.Service.GetAll()
 	total := len(students)
 	totalPages := (total + limit - 1) / limit
@@ -88,4 +95,49 @@ func (c *StudentController) PutBy(ctx iris.Context, id int64) mvc.Result {
 		}
 	}
 	return mvc.Response{Code: 400, Content: []byte("Invalid request")}
+}
+
+// POST /students
+func (c *StudentController) Post(ctx iris.Context) mvc.Result {
+	var student model.Student
+	if err := ctx.ReadJSON(&student); err != nil {
+		return mvc.Response{Code: 400, Content: []byte("Invalid request")}
+	}
+
+	if student.ID < 221000 || student.ID > 221999 {
+		return mvc.Response{Code: 400, Content: []byte("Invalid ID, ID must be between 221000 and 221999")}
+	}
+
+	students := c.Service.GetAll()
+	for _, existingStudent := range students {
+		if existingStudent.ID == student.ID {
+			return mvc.Response{Code: 400, Content: []byte("Student with this ID already exists")}
+		}
+	}
+
+	if c.Service.Post(student) {
+		return mvc.Response{
+			Code: 201,
+			Object: iris.Map{
+				"message": "Student created successfully",
+			},
+		}
+	}
+	return mvc.Response{Code: 500, Content: []byte("Failed to create student")}
+}
+
+// DELETE /students/{:id}
+func (c *StudentController) DeleteBy(ctx iris.Context, id int64) mvc.Result {
+	if id < 221000 || id > 221999 {
+		return mvc.Response{Code: 400, Content: []byte("Invalid ID, ID must be between 221000 and 221999")}
+	}
+
+	if c.Service.DeleteByID(id) {
+		return mvc.Response{
+			Object: iris.Map{
+				"message": "Student deleted successfully",
+			},
+		}
+	}
+	return mvc.Response{Code: 404, Content: []byte("Not found")}
 }

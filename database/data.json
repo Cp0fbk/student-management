@@ -704,7 +704,7 @@
     "name": "Lawrence Myers",
     "email": "lawrence.myers@example.com",
     "dob": "2003-12-25T00:00:00Z",
-    "gpa": 3.0
+    "gpa": 3
   },
   {
     "id": 221955,
@@ -1965,5 +1965,12 @@
     "email": "kelly.dixon@example.com",
     "dob": "2003-12-18T00:00:00Z",
     "gpa": 3.02
+  },
+  {
+    "id": 221122,
+    "name": "Thomas Tom",
+    "email": "thomas.tom@example.net",
+    "dob": "2004-07-23T00:00:00Z",
+    "gpa": 2.55
   }
 ]
