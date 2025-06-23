@@ -7,7 +7,7 @@ import { useModal } from '@/contexts/ModalContext'
 import { createStudent, updateStudent } from '@/services/StudentAPI'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { Student } from '@/types/Student'
+import type { Student, StudentWithOptionalId } from '@/types/Student'
 
 // Component to handle modal logic (must be inside ModalProvider)
 const ModalHandler = () => {
@@ -40,13 +40,14 @@ const ModalHandler = () => {
     }
   })
 
-  const handleSubmit = async (student: Student) => {
+  const handleSubmit = async (student: StudentWithOptionalId) => {
     if (student.id) {
       // Update existing student
       const { id, ...studentData } = student
       updateMutation.mutate({ data: studentData, id })
     } else {
       // Create new student
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, ...studentData } = student
       createMutation.mutate(studentData)
     }

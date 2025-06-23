@@ -40,6 +40,7 @@ export default function Page() {
     }
   })
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const updateMutation = useMutation({
     mutationFn: ({ data, id }: { data: Omit<Student, 'id'>; id: number }) => updateStudent(data, id),
     onSuccess: () => {

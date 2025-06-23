@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
-import type { Dispatch, SetStateAction } from 'react'
 import type { Student } from '@/types/Student'
 
 type ModalContextType = {
