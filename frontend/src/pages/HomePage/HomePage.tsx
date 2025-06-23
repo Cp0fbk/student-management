@@ -23,7 +23,14 @@ const ModalHandler = () => {
     },
     onError: (error) => {
       console.error('Failed to create student:', error)
-      toast.error('Không thể tạo sinh viên. Vui lòng thử lại!')
+      // Check if error is an AxiosError to safely access response
+      const errorMsg =
+        (typeof error === 'object' &&
+          error !== null &&
+          'response' in error &&
+          (error as any).response?.data) ||
+        'Unknown error';
+      toast.error(errorMsg);
     }
   })
 
@@ -36,7 +43,14 @@ const ModalHandler = () => {
     },
     onError: (error) => {
       console.error('Failed to update student:', error)
-      toast.error('Không thể cập nhật sinh viên. Vui lòng thử lại!')
+      // Check if error is an AxiosError to safely access response
+      const errorMsg =
+        (typeof error === 'object' &&
+          error !== null &&
+          'response' in error &&
+          (error as any).response?.data) ||
+        'Unknown error';
+      toast.error(errorMsg);
     }
   })
 

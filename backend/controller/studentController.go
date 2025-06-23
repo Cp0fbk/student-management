@@ -3,8 +3,10 @@ package controller
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 	"student-management/model"
 	"student-management/service"
+	"time"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/mvc"
@@ -102,6 +104,22 @@ func (c *StudentController) PutBy(ctx iris.Context, id int64) mvc.Result {
 		return mvc.Response{Code: 400, Content: []byte("Invalid request")}
 	}
 
+	if update.Email != nil && !strings.Contains(*update.Email, "@") {
+		return mvc.Response{Code: 400, Content: []byte("Invalid email format")}
+	}
+
+	if update.Gpa != nil && (*update.Gpa < 0.0 || *update.Gpa > 4.0) {
+		return mvc.Response{Code: 400, Content: []byte("GPA must be between 0.0 and 4.0")}
+	}
+
+	if update.Dob != nil {
+		minDob, _ := time.Parse("2006-01-02", "1900-01-01")
+		maxDob, _ := time.Parse("2006-01-02", "2007-12-31")
+		if update.Dob.Before(minDob) || update.Dob.After(maxDob) {
+			return mvc.Response{Code: 400, Content: []byte("Student must be 18 years or older")}
+		}
+	}
+
 	c.Service.PutByID(id, update)
 	return mvc.Response{
 		Object: iris.Map{
@@ -115,6 +133,20 @@ func (c *StudentController) Post(ctx iris.Context) mvc.Result {
 	var student model.Student
 	if err := ctx.ReadJSON(&student); err != nil {
 		return mvc.Response{Code: 400, Content: []byte("Invalid request")}
+	}
+
+	if !strings.Contains(student.Email, "@") {
+		return mvc.Response{Code: 400, Content: []byte("Invalid email format")}
+	}
+
+	if student.Gpa < 0.0 || student.Gpa > 4.0 {
+		return mvc.Response{Code: 400, Content: []byte("GPA must be between 0.0 and 4.0")}
+	}
+
+	minDob, _ := time.Parse("2006-01-02", "1900-01-01")
+	maxDob, _ := time.Parse("2006-01-02", "2007-12-31")
+	if student.Dob.Before(minDob) || student.Dob.After(maxDob) {
+		return mvc.Response{Code: 400, Content: []byte("Student must be 18 years or older")}
 	}
 
 	students := c.Service.GetAll()
