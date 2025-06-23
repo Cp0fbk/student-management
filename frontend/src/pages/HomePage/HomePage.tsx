@@ -41,15 +41,13 @@ const ModalHandler = () => {
   })
 
   const handleSubmit = async (student: StudentWithOptionalId) => {
-    if (student.id) {
+    if (student.id !== undefined) {
       // Update existing student
       const { id, ...studentData } = student
       updateMutation.mutate({ data: studentData, id })
     } else {
       // Create new student
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { id, ...studentData } = student
-      createMutation.mutate(studentData)
+      createMutation.mutate(student)
     }
   }
 
