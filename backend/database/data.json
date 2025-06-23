@@ -1036,13 +1036,6 @@
     "gpa": 3.36
   },
   {
-    "id": 221035,
-    "name": "Brandony Black",
-    "email": "brandony.black@example.com",
-    "dob": "2002-12-19T00:00:00Z",
-    "gpa": 2.19
-  },
-  {
     "id": 221476,
     "name": "Rose Daniels",
     "email": "rose.daniels@example.edu",
@@ -1979,5 +1972,54 @@
     "email": "Mpappe.Kylian@example.net",
     "dob": "2000-07-21T00:00:00Z",
     "gpa": 3.11
+  },
+  {
+    "id": 221795,
+    "name": "Gareth Bale",
+    "email": "bale.gareth@example.com",
+    "dob": "2001-04-12T00:00:00Z",
+    "gpa": 2.18
+  },
+  {
+    "id": 221448,
+    "name": "",
+    "email": "",
+    "dob": "0001-01-01T00:00:00Z",
+    "gpa": 0
+  },
+  {
+    "id": 221086,
+    "name": "",
+    "email": "",
+    "dob": "0001-01-01T00:00:00Z",
+    "gpa": 0
+  },
+  {
+    "id": 221729,
+    "name": "",
+    "email": "",
+    "dob": "0001-01-01T00:00:00Z",
+    "gpa": 0
+  },
+  {
+    "id": 221669,
+    "name": "",
+    "email": "",
+    "dob": "0001-01-01T00:00:00Z",
+    "gpa": 0
+  },
+  {
+    "id": 221349,
+    "name": "",
+    "email": "",
+    "dob": "0001-01-01T00:00:00Z",
+    "gpa": 0
+  },
+  {
+    "id": 221196,
+    "name": "",
+    "email": "",
+    "dob": "0001-01-01T00:00:00Z",
+    "gpa": 0
   }
 ]

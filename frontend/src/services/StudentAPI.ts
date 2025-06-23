@@ -13,7 +13,7 @@ interface Response {
 }
 
 export const getStudents = async (page: number, limit: number): Promise<PaginatedStudents> => {
-  const response = await clientAxios.get(`/students?sort=asc&page=${page}&limit=${limit}`)
+  const response = await clientAxios.get(`/students?page=${page}&limit=${limit}`)
   return response.data
 }
 
@@ -38,6 +38,9 @@ export const deleteStudent = async (id: string): Promise<{ message: string }> =>
 }
 
 export const searchStudents = async (query: string): Promise<Response> => {
-  const response = await clientAxios.get(`/students?query=${query}`)
-  return response.data
+  const body = {
+    query: query
+  }
+  const response = await clientAxios.post(`/students/search`, body)
+  return response
 }
