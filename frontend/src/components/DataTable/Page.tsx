@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button'
 import { columns } from '@/types/Columns'
 import { toast } from 'sonner'
 import { useModal } from '@/contexts/ModalContext'
+import { SelectSort } from '../Select/SelectSort'
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState(1)
+  const [sortOrder, setSortOrder] = useState('none')
   const queryClient = useQueryClient()
   const { openModalWithStudent, openModalForNew } = useModal()
 
@@ -20,8 +22,8 @@ export default function Page() {
     isError,
     refetch
   } = useQuery({
-    queryKey: ['students', currentPage],
-    queryFn: () => getStudents(currentPage, 10),
+    queryKey: ['students', currentPage, sortOrder],
+    queryFn: () => getStudents(currentPage, 10, sortOrder),
     staleTime: 5 * 60 * 1000
   })
 
@@ -76,7 +78,7 @@ export default function Page() {
   if (isLoading) {
     return (
       <div className='flex justify-center items-center h-64'>
-        <div className='text-lg'>Đang tải dữ liệu...</div>
+        <div className='text-lg'>Loading data...</div>
       </div>
     )
   }
@@ -85,19 +87,22 @@ export default function Page() {
   if (isError) {
     return (
       <div className='flex flex-col justify-center items-center h-64 space-y-4'>
-        <div className='text-lg text-red-600'>Không thể tải dữ liệu sinh viên</div>
-        <Button onClick={() => refetch()}>Thử lại</Button>
+        <div className='text-lg text-red-600'>Can't load data of student</div>
+        <Button onClick={() => refetch()}>Try again</Button>
       </div>
     )
   }
 
   return (
     <div>
-      <div className='flex items-center justify-around mt-6'>
+      <div className='flex items-center justify-between mt-6 px-28'>
         <h2 className='font-bold text-3xl'>List Student</h2>
-        <Button onClick={openModalForNew} disabled={createMutation.isPending}>
-          {createMutation.isPending ? 'Đang tạo...' : 'Add Student'}
-        </Button>
+        <div className='flex items-center gap-4'>
+          <SelectSort value={sortOrder} onChange={setSortOrder} />
+          <Button onClick={openModalForNew} disabled={createMutation.isPending}>
+            {createMutation.isPending ? 'Creating...' : 'Add Student'}
+          </Button>
+        </div>
       </div>
 
       <div className='container mx-auto py-10'>

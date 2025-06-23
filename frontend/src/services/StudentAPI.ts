@@ -12,8 +12,9 @@ interface Response {
   data?: Student[]
 }
 
-export const getStudents = async (page: number, limit: number): Promise<PaginatedStudents> => {
-  const response = await clientAxios.get(`/students?page=${page}&limit=${limit}`)
+export const getStudents = async (page: number, limit: number, sortOrder: string): Promise<PaginatedStudents> => {
+  const sort = sortOrder === 'none' ? '' : sortOrder
+  const response = await clientAxios.get(`/students?sort=${sort}&page=${page}&limit=${limit}`)
   return response.data
 }
 

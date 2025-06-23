@@ -3,10 +3,10 @@ import type { Student } from './Student'
 
 export const columns: ColumnDef<Student>[] = [
   { accessorKey: 'id', header: 'MSSV' },
-  { accessorKey: 'name', header: 'Họ và tên' },
+  { accessorKey: 'name', header: 'Full Name' },
   {
     accessorKey: 'dob',
-    header: 'Ngày sinh',
+    header: 'Date of birth',
     cell: ({ row }) => {
       const isoString = row.getValue<string>('dob') // đảm bảo là string ISO
       const date = new Date(isoString)
